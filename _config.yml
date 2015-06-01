@@ -3,7 +3,7 @@ title: Transit Dates
 email: bobschriver@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
     Ideas for day trips using public transit
-baseurl: "/transit-dates" # the subpath of your site, e.g. /blog/
+baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://bobschriver.github.io" # the base hostname & protocol for your site
 twitter_username: bobschriver
 github_username:  bobschriver

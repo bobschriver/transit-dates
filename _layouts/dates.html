@@ -7,63 +7,65 @@
 
     <body>
         <div id="items container-fluid">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <div class="media">
                 {% for item in page.items %}
                 {% if item.type == 'transit' %}
-                {% if prev_attraction == true %}
-                    </div>
-                {% endif %}
-                <div class="transit-item media">
-                    <div class="transit-icon media-left">
+                <div class="row">
+                    <div class="media col-md-12">
+                        <div class="transit-icon media-left">
                             {% if item.transit-type == 'bus' %}
                             <img src="{{ site.baseurl }}/assets/bus.png" class="media-object" style="width: 64px; height: 64px;"></img>
                             {% elsif item.transit-type == 'ferry' %}
                             <img src="{{ site.baseurl }}/assets/ferry.png" class="media-object" style="width: 64px; height: 64px;"></img>
                             {% endif %}
-                    </div>
-                    <div class="media-body">
-                        <h4 class="media-heading">
-                            Route {{ item.route-number }}
-                        </h4>
-                        <h5 class="media-heading">
-                            {{ item.transit-agency }}    
-                        </h5>
-                        {{ item.start-location }} to {{item.end-location}}
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">
+                                Route {{ item.route-number }}
+                            </h4>
+                            <h5 class="media-heading">
+                                {{ item.transit-agency }}    
+                            </h5>
+                            {{ item.start-location }} to {{item.end-location}}
+                        </div>
                     </div>
                 </div>
                 {% elsif item.type == 'attraction' %}
                 {% if prev_attraction == false %}
-                    {% assign prev_attraction = true %}
-                    {% assign accordion_id = accordion_id + 1 %}
-                    <div id="{{ accordion_id }}" role="tablist">
+                {% assign prev_attraction = true %}
+                {% assign accordion_id = accordion_id + 1 %}
                 {% endif %}
-                    <div class="media">
-                        <div class="media-left">
-                            <img src="{{ site.baseurl }}/assets/{{ item.attraction-type }}.png" class="media-object" style="width: 64px; height: 64px;"></img>
-                        </div>
-                        <div class="media-body">
-                            <div class="media-heading" role="tab">
-                                <h4>
-                            <a data-toggle="collapse" data-parent="{{ accordion_id }}" href="#{{ item.id }}">
-                                    {{ item.name }}
-                                </a>
-                            </h4>
-                        </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="media col-md-11">
+                        <div id="{{ accordion_id }}" role="tablist">
+                            <div class="media-left">
+                                <img src="{{ site.baseurl }}/assets/{{ item.attraction-type }}.png" class="media-object" style="width: 64px; height: 64px;"></img>
+                            </div>
+                            <div class="media-body">
+                                <div class="media-heading" role="tab">
+                                    <h4>
+                                        {{ item.name }}
+                                    </h4>
+                                    {{ item.short-description }}
+                                    <a data-toggle="collapse" data-parent="{{ accordion_id }}" href="#{{ item.id }}">
+                                        >>>>
+                                    </a>
+                                </div>
+                                <div id="{{ item.id }}" class="collapse">
+                                    {{ item.description }}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div id="{{ item.id }}" class="collapse">
-                        <div class="panel-body">
-                            {{ item.description }}
-                        </div>
-                    </div>
+                </div>
                 {% endif %}
                 {% endfor %}
             </div>
-            {% if prev_attraction == true %}
-                </div>
-            {% endif %}
-            <div class="col-md-3"></div>
+        </div>
+            <div class="col-md-4"></div>
         </div>
     </body>
 </html>
