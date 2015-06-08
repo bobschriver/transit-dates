@@ -7,21 +7,42 @@
 
     <body>
         <div id="items container-fluid">
-            <div class="col-md-4"></div>
-            <div class="col-md-4">
-                <div class="media">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <div class="heading">
+                    <h1>
+                        {{ page.title }}
+                    </h1>
+                </div>
+                <div>
+                    <h5>
+                        {{ page.description }}
+                    </h5>
+                </div>
                 {% for item in page.items %}
                 {% if item.type == 'transit' %}
                 <div class="row">
-                    <div class="media col-md-12">
-                        <div class="transit-icon media-left">
-                            {% if item.transit-type == 'bus' %}
-                            <img src="{{ site.baseurl }}/assets/bus.png" class="media-object" style="width: 64px; height: 64px;"></img>
-                            {% elsif item.transit-type == 'ferry' %}
-                            <img src="{{ site.baseurl }}/assets/ferry.png" class="media-object" style="width: 64px; height: 64px;"></img>
-                            {% endif %}
+                    <div class="col-md-12 media">
+                        <div class="table-cell left">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4 >
+                                        {{ item.departure-time }}
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4>
+                                        {{ item.arrival-time }}
+                                    </h4>
+                                </div>
+                            </div>
                         </div>
-                        <div class="media-body">
+                        <div class="table-cell left">
+                            <img src="{{ site.baseurl }}/assets/{{ item.transit-type }}.png" class="media-object" style="width: 64px; height: 64px;"></img>
+                        </div>
+                        <div class="table-cell">
                             <h4 class="media-heading">
                                 Route {{ item.route-number }}
                             </h4>
@@ -39,12 +60,12 @@
                 {% endif %}
                 <div class="row">
                     <div class="col-md-1"></div>
-                    <div class="media col-md-11">
+                    <div class="col-md-11">
                         <div id="{{ accordion_id }}" role="tablist">
-                            <div class="media-left">
+                            <div class="table-cell left">
                                 <img src="{{ site.baseurl }}/assets/{{ item.attraction-type }}.png" class="media-object" style="width: 64px; height: 64px;"></img>
                             </div>
-                            <div class="media-body">
+                            <div class="table-cell">
                                 <div class="media-heading" role="tab">
                                     <h4>
                                         {{ item.name }}
@@ -64,8 +85,7 @@
                 {% endif %}
                 {% endfor %}
             </div>
-        </div>
-            <div class="col-md-4"></div>
+            <div class="col-md-3"></div>
         </div>
     </body>
 </html>
