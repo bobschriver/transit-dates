@@ -1,0 +1,6 @@
+### Transit Dates
+
+The purpose of this project is to leverage simple blogging provided by Jekyll and Markdown, as well as controlled revisions through git to provide a semi-user editable compilation of trips. 
+The posts are designed to be as user friendly as possible, requiring no HTML knowledge to create. All HTML is generated on the fly through Jekyll and Liquid templating. A user could create a post, file a pull request, and then be integrated into the main blog. 
+The main concerns with this project were simple hosting/maintenence and ease of user editing and submission.
+
