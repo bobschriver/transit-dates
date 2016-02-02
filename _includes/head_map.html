@@ -1,0 +1,26 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+    <meta name="description" content="{{ site.description }}">
+
+    <link rel="stylesheet" href="{{ "/css/main.css" | prepend: site.baseurl }}">
+    <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+    
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://jquery-csv.googlecode.com/files/jquery.csv-0.71.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script> 
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
+
+    <script src="{{ "/scripts/agencies.js" | prepend: site.baseurl }}"></script>
+    <script src="{{ "/scripts/routes.js" | prepend: site.baseurl }}"></script>
+    <script src="{{ "/scripts/stops.js" | prepend: site.baseurl }}"></script>
+    <script src="{{ "/scripts/segments.js" | prepend: site.baseurl }}"></script>
+    <script src="{{ "/scripts/mapbox_init.js" | prepend: site.baseurl }}"></script>
+    <script src="{{ "/scripts/mapbox_helper.js" | prepend: site.baseurl }}"></script>
+</head>
