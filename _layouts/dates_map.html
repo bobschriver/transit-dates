@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+    {% include head_map.html %}
+
+    <body>
+        {% include header.html %}
+        <div id='map' style='height:480px;'></div>
+        {% for item in page.items %}
+        {% if item.type == "attraction" %}
+            {% if item.has_lat_lng %}
+                <script>add_attraction_by_lat_lng('{{item.attraction-type}}', '{{item.name}}', {{item.latitude}}, {{item.longitude}})</script>
+            {% else %}
+                <script>add_attraction_by_address('{{item.attraction-type}}', '{{item.name}}', '{{item.address}}')</script>
+            {% endif %}
+        {% else %}
+            <script>add_transit('{{item.transit-type}}', '{{item.transit-agency}}', '{{item.route-number}}', '{{item.first-stop-name}}', '{{item.last-stop-name}}')</script>
+        {% endif %}
+        {% endfor %}
+    </body>
+</html>
