@@ -5,7 +5,18 @@
 
     <body>
         {% include header.html %}
-        <div id='map' style='height:480px;'></div>
+        <div class='map_container'>
+            <div id='map' class='map'></div>
+            <div class='sidebar_container'>
+                <div id='index_scroller' class='index_scroller'>
+                    <div id='starting_padding' style='width:100%;height:57px;float:left;'></div>
+                    <div id='index_container' class='index_container'></div>
+                </div>
+                <div class='steps_button_container'>
+                    <button id='steps_button' class='steps_button' onclick='increment_steps()'></button>
+                </div>
+            </div>
+        </div>
         {% for item in page.items %}
         {% if item.type == "attraction" %}
             {% if item.has_lat_lng %}

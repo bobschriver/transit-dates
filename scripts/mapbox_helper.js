@@ -1,137 +1,205 @@
 var map;
-var transit_layer;
-var attraction_layer;
 
-function add_transit(type, agency_name, route_name, first_stop_name, last_stop_name) {
-    agency_id = agencies_json[agency_name];
-    //console.log(agency_name);
-    //console.log(agency_id);
+var steps_index = 0;
+var steps;
 
-    route_id = routes_json[route_name];
-    //console.log(route_name);
-    //console.log(route_id);
+function get_default_transit_style() {
+    return {
+        weight:2,
+        opacity:1,
+        color:'black'
+    }
+}
 
-    first_stop_ids = stops_json[first_stop_name];
-    //console.log(first_stop_name);
-    //console.log(first_stop_ids);
- 
-    last_stop_ids = stops_json[last_stop_name];
-    //console.log(last_stop_name);
-    //console.log(last_stop_ids);
+function get_selected_transit_style() {
+    return {
+        weight:5,
+        opacity:1,
+        color:'red'
+    }
+}
 
-    trips = segments_json[agency_id][route_id];
+function get_non_selected_transit_style() {
+    return {
+        weight:2,
+        opacity:0.5,
+        color: 'black'
+    }
+}
 
-    coordinates = [];
+var transit_item_width = 250;
+var transit_item_margin = 10 + 10;
 
-    found_sequence = false;
-    for (trip_id in trips) {
-        if (trip_id == "route_name") {
-            continue;
-        }
-        
-        trip = trips[trip_id];
-        stops = trip['stops'];
+var attraction_item_width = 250;
+var attraction_item_margin = 1 + 1;
 
-        coordinates = []
-        found_sequence = false;
+
+function increment_steps() {
+
+    var layer = steps[steps_index]['feature_layer'];
     
-        if (stops.length > 0) {
-            stops.sort(function (first, second) {
-                return parseInt(first['stop_sequence']) - parseInt(second['stop_sequence']);
-            });
+    var scroller = document.getElementById('index_scroller');
+    var num_items = layer['_geojson']['features'].length;
 
-            //console.log(stops);
+    var scroll_width = 0;
 
-            found_sequence_start = false;
-            found_sequence_end = false;
-            for (stop_key in stops) {
-                stop = stops[stop_key];
-            
-                if (first_stop_ids.indexOf(stop['stop_id']) > -1) {
-                    //console.log("Found sequence start");
-                    if (found_sequence_end) {
-                        //console.log("After sequence end");
-                        // Found the sequence end before the sequence start, which means we're going the wrong way
-                        // Could potentially continue here, but it would be the return trip
-                    } else {
-                        found_sequence_start = true;
-                    }
-                }
-               
-                // We put this in the middle because we want the sequence end coordinate to be added
-                // Next loop after we find it we will skip this
-                if (found_sequence_start && !found_sequence_end) {
-                    coordinates.push([stop['location']['longitude'], stop['location']['latitude']]);
-                }
-
-                if (last_stop_ids.indexOf(stop['stop_id']) > -1) {
-                    //console.log("Found sequence end");
-                    if (!found_sequence_start) {
-                        //console.log("Before sequence start");
-                        // Found sequence end before sequence start, means we're going backwards
-                        // Since we already sorted the array by sequence number
-                    }
-                        
-                    found_sequence_end = true;
-                }
-                
-            }
-
-            found_sequence = found_sequence_start && found_sequence_end;
-        }
-
-        if (found_sequence) {
-            break;
-        }
+    if (steps[steps_index]['type'] == 'transit') {
+        scroll_width = (transit_item_width + transit_item_margin) * num_items;
+    } else {
+        scroll_width = (attraction_item_width + attraction_item_margin) * num_items;
     }
 
-    if (!found_sequence) {
+    console.log(scroller.scrollLeft);
+    console.log(scroll_width);
+
+    scroller.scrollLeft += scroll_width;
+
+    // Code to deal with zooming/panning to correct location
+    map.panTo(layer.getBounds().getCenter());
+    map.fitBounds(layer.getBounds(), { paddingTopLeft: [300, 0]});
+
+    if (steps[steps_index]['type'] == 'transit') {
+        for (var i = 0; i < steps.length; i++) {
+            if (steps[i]['type'] == 'transit') {
+                if (i == steps_index) {
+                    steps[i]['feature_layer'].setStyle(get_selected_transit_style());
+                } else {
+                    steps[i]['feature_layer'].setStyle(get_non_selected_transit_style());
+                }
+            } else {
+            }
+        }
+    } else {
+        for (var i = 0; i < steps.length; i++) {
+            if (steps[i]['type'] == 'attraction') {
+            } else {
+                steps[i]['feature_layer'].setStyle(get_default_transit_style());
+            }
+        }
+    }
+    
+    steps_index += 1;
+    /*if (steps_index >= steps.length) {
+        steps_index = 0;
+    }*/
+
+}
+
+function add_transit_html(type, agency_name, route_name, first_stop_name, last_stop_name) {
+    // Code to deal with adding each transit line to the index div
+    var indeces = document.getElementById('index_container');
+
+    var index = indeces.appendChild(document.createElement('div'));
+    index.className = 'index_item transit_item';
+
+    var icon_section = index.appendChild(document.createElement('div'));
+    var icon = icon_section.appendChild(document.createElement('img'));
+    icon_section.style = "float:left;";
+    icon.src = "/assets/img/" + type + ".png";
+    icon.height = 50;
+    icon.width = 50;
+
+    var details_section = index.appendChild(document.createElement('div'));
+    details_section.innerHTML += agency_name + " <br />";
+    details_section.innerHTML += route_name + " <br />"; 
+}
+
+function add_transit_geojson(data, curr_step_index) {
+    console.log(data);
+
+    if (data['status'] != 'Success') {
         return;
     }
 
+    transit_geojson = {
+        type: 'FeatureCollection',
+        features: [
+        {
+            type: 'Feature',
+            geometry: {
+                type: 'LineString',
+                coordinates: data['shape']
+            }
+        }
+        ]
+    };
+    
+    var layer = L.mapbox.featureLayer();
+    layer.setGeoJSON(transit_geojson);
+    layer.addTo(map);
+    
+    steps[curr_step_index]['feature_layer'] = layer;
+    /*if (curr_step_index == 0) {
+        increment_steps();
+    }*/
+}
+
+function add_transit_step() {
+    if (typeof steps == 'undefined') {
+        steps = [];
+    }
+
+    steps.push({
+        type: 'transit',
+        zoom_to: 16,
+        num_items: 1
+    });
+
+    return steps.length - 1;
+}
+
+function add_transit(type, agency_name, route_name, first_stop_name, last_stop_name) {
+    // Code to deal with adding geojson to mapbox
+    // Note that we create a new layer for each transit line
+
+    add_transit_html(type, agency_name, route_name, first_stop_name, last_stop_name);   
+    
     if (typeof map == 'undefined') {
         map = L.mapbox.map('map', mapbox_map_id);
     }
 
-    if (typeof transit_layer == 'undefined') {
-        transit_layer = L.mapbox.featureLayer().addTo(map);
-        transit_layer.setGeoJSON({type: 'FeatureCollection', features: []});
-    }
-     
-    transit_geojson = transit_layer.getGeoJSON();
+    var url_str = "http://localhost:5000/api/v1.0/shape?";
+    url_str += "agency_name=" + encodeURIComponent(agency_name);
+    url_str += "&route_name=" + encodeURIComponent(route_name);
+    url_str += "&first_stop_name=" + encodeURIComponent(first_stop_name);
+    url_str += "&last_stop_name=" + encodeURIComponent(last_stop_name);
 
-    console.log(transit_geojson);
+    console.log(url_str);
 
-    transit_geojson['features'].push(
-        {
-        type: 'Feature',
-        geometry: {
-            type: 'LineString',
-            coordinates: coordinates
-        }
-    });
+    var curr_steps_index = add_transit_step()
 
-    transit_layer.setGeoJSON(transit_geojson);
-}
-
-function add_attraction_by_address(type, name, address) {
-    console.log(address);
-    
-    var callback = function(err, data) {
-        console.log("Lat: " + data.latlng[0] + " Lon: " + data.latlng[1]);
-        add_attraction_by_lat_lng(type, name, data.latlng[0], data.latlng[1]);
+    var callback = function(data) {
+        add_transit_geojson(data, curr_steps_index)
     }
 
-    geocoder.query(address, callback);
+    $.ajax({
+            url: url_str,
+            jsonp: "callback",
+            dataType: "jsonp",
+            data: {}
+    }).done(callback);
 }
 
-function add_attraction_by_lat_lng(type, name, latitude, longitude) {
+function add_attraction_html(type, name) {
+    var indeces = document.getElementById('index_container');
 
-    console.log(type);
-    console.log(name);
-    console.log(latitude);
-    console.log(longitude);
+    var index = indeces.appendChild(document.createElement('div'));
+    index.className = 'index_item attraction_item';
+    // Should pass a reference to this div, or create it above to maintain order
 
+    var icon_section = index.appendChild(document.createElement('div'));
+    var icon = icon_section.appendChild(document.createElement('img'));
+    icon_section.style = "float:left;";
+    icon.src = "/assets/img/" + type + ".png";
+    icon.height = 50;
+    icon.width = 50;
+
+    var details_section = index.appendChild(document.createElement('div'));
+    details_section.innerHTML += name + " <br />";
+
+}
+
+function get_attraction_geojson(type, name, latitude, longitude) {
     var marker_color = '#BE9A6B';
     var marker_symbol = 'cafe';
 
@@ -155,38 +223,88 @@ function add_attraction_by_lat_lng(type, name, latitude, longitude) {
             marker_symbol = 'restaurant';
             break;
     }
-    
-    if (typeof map == 'undefined') {
-        map = L.mapbox.map('map', mapbox_map_id);
-    }
 
-    if (typeof attraction_layer == 'undefined') {
-        attraction_layer = L.mapbox.featureLayer().addTo(map);
-        attraction_layer.setGeoJSON({type: 'FeatureCollection', features: []});
-    }
-
-    attraction_geojson = attraction_layer.getGeoJSON();
-
-    console.log(attraction_geojson);
-
-    attraction_geojson['features'].push(    
-    {
+    return {
         type: 'Feature',
         geometry: {
             type: 'Point',
             coordinates: [
-                longitude,
-                latitude 
-            ]
-        },
-        properties: {
-            title: name,
-            'marker-size': 'large',
-            'marker-color': marker_color,
-            'marker-symbol': marker_symbol
-        }
-    }
-    );
-
-    attraction_layer.setGeoJSON(attraction_geojson);
+                        longitude,
+                        latitude 
+                    ]
+                },
+                properties: {
+                    title: name,
+                    'marker-size': 'large',
+                    'marker-color': marker_color,
+                    'marker-symbol': marker_symbol
+                }
+            };
 }
+
+function add_attraction_step() {
+    
+    if (typeof steps == 'undefined') {
+        steps = [];
+    }
+
+    if (typeof steps[steps.length - 1] == 'undefined' ||
+            steps[steps.length - 1]['type'] == 'transit') {
+       
+        steps.push({
+            type: 'attraction',
+            zoom_to: 16,
+        });
+    } 
+
+    return steps.length - 1;
+}
+
+function add_attraction_by_address(type, name, address) {
+    add_attraction_html(type, name);
+
+    var step_index = add_attraction_step();
+
+    var callback = function(err, data) {
+        add_attraction_to_map(type, name, data.latlng[0], data.latlng[1], step_index);
+    }
+
+    geocoder.query(address, callback);
+}
+
+function add_attraction_by_lat_lng(type, name, latitude, longitude) {
+    add_attraction_html(type, name);
+
+    var step_index = add_attraction_step();
+    
+    add_attraction_to_map(type, name, latitude, longitude, step_index);
+}
+
+function add_attraction_to_map(type, name, latitude, longitude, step_index) {
+    if (typeof map == 'undefined') {
+        map = L.mapbox.map('map', mapbox_map_id);
+    }
+         
+    if (typeof steps[step_index]['feature_layer'] == 'undefined') {
+
+        layer = L.mapbox.featureLayer().addTo(map);
+
+        layer.setGeoJSON({
+            type: 'FeatureCollection',
+            features: []
+        });
+
+        steps[step_index]['feature_layer'] = layer;
+
+        steps[step_index]['num_items'] = 0;
+    }
+
+    steps[steps_index]['num_items'] += 1;
+
+    layer = steps[step_index]['feature_layer'];
+
+    curr_geojson = layer.getGeoJSON();
+    curr_geojson['features'].push(get_attraction_geojson(type, name, latitude, longitude));
+    layer.setGeoJSON(curr_geojson);
+}
+
