@@ -1,0 +1,82 @@
+
+.map
+{
+    width:100%;
+    height:640px;
+}
+
+.index_item
+{
+    float:left;
+
+    width:250px;
+
+    background-color:white;
+}
+
+.transit_item
+{
+    margin-left:10px;
+    margin-right:10px;
+}
+
+.attraction_item
+{
+    margin-left:1px;
+    margin-right:1px;
+}
+
+.steps_button
+{
+   background: green;
+
+   width:100%;
+   height:100%;
+
+}
+
+.steps_button_container
+{
+    width: 10%;
+    height: 57px;
+
+    position: absolute;
+    right:0;
+    z-index:1;
+}
+
+.map_container
+{
+    height:640px;
+    width:100%;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar_container
+{
+    z-index:1;
+    bottom:0;
+    margin:20px;
+    position:absolute;
+
+    width:100%;
+    height:57px;
+
+    overflow:hidden;
+}
+
+.index_scroller
+{
+    position:absolute;
+    left:0;
+    width:90%;
+    overflow-x: hidden;
+}
+
+.index_container 
+{
+    width:10000px;
+}
+
